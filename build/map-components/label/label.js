@@ -1,0 +1,27 @@
+"use strict";
+angular.module('angularCesium').directive('label', function() {
+  return {
+    restrict: 'E',
+    require: '^labelsLayer',
+    scope: {
+      color: '&',
+      text: '&',
+      position: '&'
+    },
+    link: function(scope, element, attrs, labelsLayerCtrl) {
+      var labelDesc = {};
+      var position = scope.position();
+      labelDesc.position = Cesium.Cartesian3.fromDegrees(Number(position.latitude) || 0, Number(position.longitude) || 0, Number(position.altitude) || 0);
+      var color = scope.color();
+      if (color) {
+        labelDesc.color = color;
+      }
+      labelDesc.text = scope.text();
+      var label = labelsLayerCtrl.getLabelCollection().add(labelDesc);
+      scope.$on('$destroy', function() {
+        labelsLayerCtrl.getLabelCollection().remove(label);
+      });
+    }
+  };
+});
+//# sourceURL=map-components/label/label.js
