@@ -34,15 +34,13 @@
               continue;
             }
             Object.defineProperty(proxy, key, {
-              get: function(){ return tool[key]; },
-              set: function(val){ tool[key] = val; }
+              get: () => tool[key],
+              set: val => { tool[key] = val; }
             });
           }
 
           Object.defineProperty(proxy, 'start', {
-            get: function(){
-              return () => { toolBarCtrl.startTool(tool); };
-            }
+            get: () => () => toolBarCtrl.startTool(tool)
           });
 
           scope.tool = proxy;
