@@ -4,8 +4,6 @@
   angular.module('angularCesium').directive('toolBar', [function() {
     return {
       require: '^map',
-      transclude: true,
-      template: '<div ng-transclude=""></div>',
       controller: ['$scope', function($scope) {
         var currentTool = null;
         this.getCesiumWidget = (function() {
