@@ -10,8 +10,8 @@
     function(){
       return {
         require: '^map',
-        transclude: true,
-        template: '<div ng-transclude=""></div>',
+        //transclude: true,
+        //template: '<div ng-transclude=""></div>',
         controller: ['$scope',
           function($scope) {
             let currentTool = null;
