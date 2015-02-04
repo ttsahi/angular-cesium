@@ -13,7 +13,6 @@ angular.module('angularCesium').directive('draggable', ['$document', function($d
     var mapRect = scope.mapRect,
         newMapRect = {},
         elemRect = {};
-    console.log(mapRect);
     var toolbar = element.parent();
     element.on('mousedown', function(event) {
       event.preventDefault();
@@ -25,7 +24,6 @@ angular.module('angularCesium').directive('draggable', ['$document', function($d
         newMapRect.right = offsetLeft + mapRect.right - 5;
         newMapRect.bottom = offsetTop + mapRect.bottom - 15;
         elemRect = toolbar[0].getBoundingClientRect();
-        console.log('draggable2', newMapRect);
       } else {
         offsetTop = 0;
         offsetLeft = 0;

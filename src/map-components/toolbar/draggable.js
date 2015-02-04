@@ -20,7 +20,6 @@ angular.module('angularCesium')
           newMapRect.right = offsetLeft + mapRect.right - 5;
           newMapRect.bottom = offsetTop + mapRect.bottom - 15;
           elemRect = toolbar[0].getBoundingClientRect();
-          console.log('draggable2',newMapRect);
         }else{
           offsetTop = 0;
           offsetLeft = 0;
