@@ -30,16 +30,27 @@
         '</div>' +
         '</div>',
         link: function(scope, element, attrs, toolCtrl){
+          if(isFinite(attrs.width) && isFinite(attrs.height)){
+            let width =  Number.parseInt(attrs.width) + 'px';
+            let height =  Number.parseInt(attrs.height) + 'px';
+            element.css({position: 'relative', width: width, height: height});
+          }
+
           let minLevel = isFinite(attrs.min) ? Number.parseInt(attrs.min) : 0;
           let maxLevel = isFinite(attrs.max) ? Number.parseInt(attrs.max) : 100;
 
           if(minLevel < 0 || maxLevel < 0 || minLevel >= maxLevel){
-            throw new Error("min or max attrs value are invalid.");
+            throw new Error("min or max attributes value are invalid.");
           }
+
+          let jumps = isFinite(attrs.jump) ? Number.parseInt(attrs.jump) : 10;
+
+          let zoomTool = toolCtrl.getTool();
 
           let levelValue = 90 / (maxLevel - minLevel);
           let currentLevel = (maxLevel - minLevel) / 2;
           let zoomLevel = (maxLevel + minLevel) / 2;
+          let tempLevel = zoomLevel;
           let currentPointerHeight = 45;
 
           let pointer  = angular.element(element.find('span')[2]);
@@ -53,6 +64,7 @@
             event.preventDefault();
             clientY = event.clientY;
             startPointerHeight = currentPointerHeight;
+            tempLevel = zoomLevel;
             pointer.addClass('active');
           });
 
@@ -85,6 +97,13 @@
 
               currentLevel = Math.trunc(currentPointerHeight / levelValue);
               zoomLevel = maxLevel - currentLevel;
+              if(zoomLevel > tempLevel){
+                zoomTool.zoomIn((zoomLevel - tempLevel) * jumps);
+              }
+              if(zoomLevel < tempLevel){
+                zoomTool.zoomOut((tempLevel - zoomLevel) * jumps);
+              }
+              tempLevel = zoomLevel;
               pointer.css('top', currentLevel * levelValue + '%');
             }
           });
@@ -95,7 +114,7 @@
               currentLevel--;
               currentPointerHeight = currentLevel * levelValue;
               pointer.css('top', currentPointerHeight + '%');
-              console.log(zoomLevel);
+              zoomTool.zoomIn(jumps);
             }
           };
 
@@ -105,7 +124,7 @@
               currentLevel++;
               currentPointerHeight = currentLevel * levelValue;
               pointer.css('top', currentPointerHeight + '%');
-              console.log(zoomLevel);
+              zoomTool.zoomOut(jumps);
             }
           };
         }

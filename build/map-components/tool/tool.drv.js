@@ -4,7 +4,7 @@
   angular.module('angularCesium').directive('tool', ['Tool', function(Tool) {
     return {
       replace: true,
-      require: '^toolBar',
+      require: '^toolbar',
       transclude: 'element',
       scope: {type: '='},
       controller: ['$scope', function($scope) {

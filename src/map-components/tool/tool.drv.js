@@ -10,7 +10,7 @@
     function(Tool){
       return {
         replace: true,
-        require: '^toolBar',
+        require: '^toolbar',
         transclude: 'element',
         scope: {
           type: '='
