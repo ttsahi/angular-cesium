@@ -10,9 +10,10 @@ angular.module('angularCesium').directive('draggable', ['$document', function($d
         y1 = 0,
         offsetTop = -1,
         offsetLeft = -1;
-    var mapRect = scope.$parent.mapRect,
+    var mapRect = scope.mapRect,
         newMapRect = {},
         elemRect = {};
+    console.log(mapRect);
     var toolbar = element.parent();
     element.on('mousedown', function(event) {
       event.preventDefault();

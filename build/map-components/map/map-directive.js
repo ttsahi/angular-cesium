@@ -26,7 +26,6 @@ angular.module('angularCesium').directive('map', function() {
           scope.dimensions = 3;
         }
         scope.cesium = new Cesium.CesiumWidget(element.find('div')[0], {sceneMode: getSceneMode(scope.dimensions)});
-        scope.mapRect = element[0].getBoundingClientRect();
       }}
   };
 });

@@ -7,7 +7,7 @@ angular.module('angularCesium')
   .directive('draggable', ['$document', function($document) {
     return function(scope, element, attr) {
       var startX = 0, startY = 0, x = 0, y = 0,  x1 = 0, y1 = 0, offsetTop = -1,offsetLeft = -1;
-      var mapRect = scope.$parent.mapRect,newMapRect = {}, elemRect = {};
+      var mapRect = scope.mapRect,newMapRect = {}, elemRect = {};
       var toolbar = element.parent();
       element.on('mousedown', function(event) {
         // Prevent default dragging of selected content
