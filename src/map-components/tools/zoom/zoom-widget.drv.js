@@ -30,9 +30,9 @@
         '</div>' +
         '</div>',
         link: function(scope, element, attrs, toolCtrl){
-          if(isFinite(attrs.width) && isFinite(attrs.height)){
-            let width =  Number.parseInt(attrs.width) + 'px';
-            let height =  Number.parseInt(attrs.height) + 'px';
+          if(isFinite(attrs.width) || isFinite(attrs.height)){
+            let width =  isFinite(attrs.width) ? Number.parseInt(attrs.width) + 'px' : 'inherit';
+            let height =  isFinite(attrs.height) ? Number.parseInt(attrs.height) + 'px' : 'inherit';
             element.css({position: 'relative', width: width, height: height});
           }
 
