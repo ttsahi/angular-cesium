@@ -18,6 +18,7 @@ module.exports = function(config) {
       'bower_components/angular/angular.js',
       'bower_components/angular-mocks/angular-mocks.js',
       'bower_components/observable-collection/observableCollection.js',
+      'bower_components/CesiumUnminified/Cesium.js',
       'node_modules/gulp-traceur/node_modules/traceur/bin/traceur-runtime.js',
       'build/**/*.js',
       'test/**/*.spec.js'
