@@ -9,7 +9,7 @@ describe('src', function(){
   beforeEach(module('angularCesium'));
 
   describe('services', function(){
-    describe('tool', function(){
+    describe('Tool', function(){
 
       var Tool;
 
@@ -17,8 +17,41 @@ describe('src', function(){
         Tool = _Tool_;
       }));
 
-      it('Tool class should be exist.', function(){
+      it('Tool should be constructor.', function(){
         expect(typeof Tool).toBe('function');
+      });
+
+      describe('methods', function(){
+
+        var tool;
+
+        beforeEach(function(){
+          tool = new Tool();
+        });
+
+        describe('start', function(){
+          it('should throw no implementation exception.', function(){
+            expect(function(){ tool.start(); }).toThrow();
+          });
+        });
+
+        describe('stop', function(){
+          it('should throw no implementation exception.', function(){
+            expect(function(){ tool.stop(); }).toThrow();
+          });
+        });
+
+        describe('cancel', function(){
+          it('should throw no implementation exception.', function(){
+            expect(function(){ tool.cancel(); }).toThrow();
+          });
+        });
+
+        describe('onUpdate', function(){
+          it('should throw no implementation exception.', function(){
+            expect(function(){ tool.onUpdate(); }).toThrow();
+          });
+        });
       });
     });
   });
