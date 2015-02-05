@@ -23,6 +23,9 @@
         }
         var jumps = isFinite(attrs.jump) ? Number.parseInt(attrs.jump) : 10;
         var zoomTool = toolCtrl.getTool();
+        if ((typeof zoomTool.zoomIn !== 'function') || (typeof zoomTool.zoomOut !== 'function')) {
+          throw new TypeError("Zoom widget must be inside tool with ZoomTool type.");
+        }
         var levelValue = 90 / (maxLevel - minLevel);
         var currentLevel = (maxLevel - minLevel) / 2;
         var zoomLevel = (maxLevel + minLevel) / 2;
@@ -44,7 +47,6 @@
           if (clientY !== null) {
             clientY = null;
             pointer.removeClass('active');
-            console.log(zoomLevel);
           }
         }));
         $document.on('mousemove', (function(event) {

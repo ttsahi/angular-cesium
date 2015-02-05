@@ -40,6 +40,15 @@ describe('src', function(){
           expect(scope.tool.onUpdate).toBeDefined();
         });
 
+        it('should return the tool proxy from getTool() in the controller.', function(){
+          $rootScope.defaultTool = Tool;
+          var element = $compile('<map><toolbar><tool type="defaultTool"></tool></toolbar></map>')($rootScope);
+          var toolDirective = angular.element(element.find('tool')[0]);
+          var scope = toolDirective.scope();
+          var controller = toolDirective.controller('tool');
+          expect(controller.getTool()).toBe(scope.tool);
+        });
+
         it('should append the transclude content to the dom.', function(){
           $rootScope.defaultTool = Tool;
           var element = $compile('<map><toolbar><tool type="defaultTool">Transclude Content</tool></toolbar></map>')($rootScope);
