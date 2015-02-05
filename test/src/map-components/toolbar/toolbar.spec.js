@@ -42,7 +42,7 @@ describe('src', function(){
           expect(ctrl.getCesiumWidget()).not.toBeUndefined(true);
         });
         it('mapRect should NOT be undefined', function(){
-          expect(toolbarElem.scope().mapRect.constructor.name).toBe('ClientRect');
+          expect(toolbarElem.scope().mapRect().constructor.name).toBe('ClientRect');
         });
         describe('startTool function', function(){
           var tool;

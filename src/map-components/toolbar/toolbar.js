@@ -27,7 +27,8 @@ angular.module('angularCesium').directive('toolbar', function() {
     link : {
       pre: function(scope, element, attrs, mapCtrl){
         scope.getCesiumWidget = mapCtrl.getCesiumWidget;
-        scope.mapRect = angular.element(scope.getCesiumWidget().container)[0].getBoundingClientRect();
+        scope.mapRect = function(){ return angular.element(scope.getCesiumWidget().canvas)[0].getBoundingClientRect();
+        };
       }
     }
   };
