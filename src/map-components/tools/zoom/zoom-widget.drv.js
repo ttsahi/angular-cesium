@@ -47,6 +47,10 @@
 
           let zoomTool = toolCtrl.getTool();
 
+          if((typeof zoomTool.zoomIn !== 'function') || (typeof zoomTool.zoomOut !== 'function')){
+            throw new TypeError("Zoom widget must be inside tool with ZoomTool type.");
+          }
+
           let levelValue = 90 / (maxLevel - minLevel);
           let currentLevel = (maxLevel - minLevel) / 2;
           let zoomLevel = (maxLevel + minLevel) / 2;
@@ -72,7 +76,6 @@
             if(clientY !== null){
               clientY = null;
               pointer.removeClass('active');
-              console.log(zoomLevel);
             }
           });
 
