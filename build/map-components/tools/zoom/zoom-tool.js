@@ -8,16 +8,10 @@
     };
     ($traceurRuntime.createClass)(ZoomTool, {
       start: function() {
-        console.log('Examp-Tool start!');
+        return true;
       },
       stop: function() {
-        console.log('Examp-Tool start!');
-      },
-      cancel: function() {
-        console.log('Examp-Tool start!');
-      },
-      onUpdate: function() {
-        console.log('Examp-Tool start!');
+        return true;
       },
       zoomIn: function(jumps) {
         jumps = Number.isFinite(jumps) ? jumps : 1;

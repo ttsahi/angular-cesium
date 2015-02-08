@@ -15,13 +15,9 @@
           this._ellipsoid = map.scene.globe.ellipsoid;
         }
 
-        start(){ console.log('Examp-Tool start!'); }
+        start(){ return true; }
 
-        stop(){ console.log('Examp-Tool start!'); }
-
-        cancel(){ console.log('Examp-Tool start!'); }
-
-        onUpdate(){ console.log('Examp-Tool start!'); }
+        stop(){ return true; }
 
         zoomIn(jumps){
           jumps = Number.isFinite(jumps) ? jumps : 1;
