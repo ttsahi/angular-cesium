@@ -30,6 +30,7 @@
             startX = event.offsetX;
             startY = event.offsetY;
             this._enshureFly = false;
+            mapContainer.css('cursor', 'zoom-in');
 
             selector.css({
               position: 'absolute',
@@ -76,11 +77,13 @@
           mapContainer.on('mouseup', event => {
             selectedStart = false;
             selector.remove();
+            mapContainer.css('cursor', '');
             this._enshureFly = true;
           });
 
           mapContainer.on('mouseleave', event => {
             selectedStart = false;
+            mapContainer.css('cursor', '');
             selector.remove();
           });
         }
