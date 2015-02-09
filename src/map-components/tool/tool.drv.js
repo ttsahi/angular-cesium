@@ -6,8 +6,8 @@
 
   'use strict';
 
-  angular.module('angularCesium').directive('tool', ['Tool',
-    function(Tool){
+  angular.module('angularCesium').directive('tool', ['Tool', 'Proxy',
+    function(Tool, Proxy){
       return {
         replace: true,
         require: '^toolbar',
@@ -31,23 +31,14 @@
             throw new TypeError("tool must be instance of Tool.");
           }
 
-          let proxy = {};
-
-          for(let key in tool){
-            if(key === 'start'){
-              continue;
-            }
-            Object.defineProperty(proxy, key, {
-              get: () => tool[key],
-              set: val => { tool[key] = val; }
-            });
-          }
-
-          Object.defineProperty(proxy, 'start', {
-            get: () => () => toolBarCtrl.startTool(tool)
+          tool.start = Proxy(tool.start, {
+            apply: (target, context) => toolBarCtrl.startTool({
+              start: () => target.apply(tool),
+              stop: () => tool.stop()
+            })
           });
 
-          scope.tool = proxy;
+          scope.tool = tool;
 
           linker(scope, (clone) => {
             element.parent().append(clone);
