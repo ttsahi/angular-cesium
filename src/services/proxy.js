@@ -10,7 +10,7 @@
     function(){
 
       function Proxy(target, handler) {
-        if(typeof target !== 'object' && typeof target !== 'function'){
+        if(target === null || (typeof target !== 'object' && typeof target !== 'function')){
           throw new TypeError("Target must be object or function.");
         }
 
@@ -18,7 +18,7 @@
           return
         }
 
-        if(typeof handler !== 'object'){
+        if(handler === null || typeof handler !== 'object'){
           throw  new TypeError("Handler mut be object");
         }
 
