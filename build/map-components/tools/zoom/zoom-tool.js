@@ -2,9 +2,11 @@
 (function(angular) {
   'use strict';
   angular.module('angularCesium').factory('ZoomTool', ['Tool', function(Tool) {
+    var _camera = Symbol('_camera');
+    var _ellipsoid = Symbol('_ellipsoid');
     var ZoomTool = function ZoomTool(map) {
-      this._camera = map.scene.camera;
-      this._ellipsoid = map.scene.globe.ellipsoid;
+      this[_camera] = map.scene.camera;
+      this[_ellipsoid] = map.scene.globe.ellipsoid;
     };
     ($traceurRuntime.createClass)(ZoomTool, {
       start: function() {
@@ -16,17 +18,17 @@
       zoomIn: function(jumps) {
         jumps = Number.isFinite(jumps) ? jumps : 1;
         for (var i = 0; i < jumps; i++) {
-          var cameraHeight = this._ellipsoid.cartesianToCartographic(this._camera.position).height;
+          var cameraHeight = this[_ellipsoid].cartesianToCartographic(this[_camera].position).height;
           var moveRate = cameraHeight / 100.0;
-          this._camera.moveForward(moveRate);
+          this[_camera].moveForward(moveRate);
         }
       },
       zoomOut: function(jumps) {
         jumps = Number.isFinite(jumps) ? jumps : 1;
         for (var i = 0; i < jumps; i++) {
-          var cameraHeight = this._ellipsoid.cartesianToCartographic(this._camera.position).height;
+          var cameraHeight = this[_ellipsoid].cartesianToCartographic(this[_camera].position).height;
           var moveRate = cameraHeight / 100.0;
-          this._camera.moveBackward(moveRate);
+          this[_camera].moveBackward(moveRate);
         }
       }
     }, {}, Tool);

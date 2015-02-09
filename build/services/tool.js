@@ -3,9 +3,7 @@
 (function(angular) {
   'use strict';
   angular.module('angularCesium').factory('Tool', [function() {
-    var Tool = function Tool(map) {
-      this._map = map;
-    };
+    var Tool = function Tool() {};
     ($traceurRuntime.createClass)(Tool, {
       start: function() {
         throw "No implementation";

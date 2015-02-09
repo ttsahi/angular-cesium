@@ -9,9 +9,20 @@
   angular.module('angularCesium').factory('ZoomAreaTool', ['Tool', 'Cesium',
     function(Tool, Cesium){
 
-      class ZoomAreaTool extends Tool {
+      let _map = Symbol('_map');
+      let _ensureFly = Symbol('_ensureFly');
+      let _initMapMouseHandlers = Symbol('_initMapMouseHandlers');
+      let _removeMapMouseHandlers = Symbol('_removeMapMouseHandlers');
+      let _initCesiumMouseHandlers = Symbol('_initCesiumMouseHandlers');
+      let _removeCesiumMouseHandlers = Symbol('_removeCesiumMouseHandlers');
 
-        _initMapMouseHandlers(){
+      class ZoomAreaTool extends Tool {
+        constructor(map){
+          this[_map] = map;
+          this[_ensureFly] = false;
+        }
+
+        [_initMapMouseHandlers](){
           let pageX = 0;
           let pageY = 0;
           let startX = 0;
@@ -20,7 +31,7 @@
           let deltaY = 0;
           let selectedStart = false;
           let selector = angular.element('<div></div>');
-          let mapContainer = angular.element(this._map.canvas.parentNode);
+          let mapContainer = angular.element(this[_map].canvas.parentNode);
 
           selector.css('border', '2px dashed white');
 
@@ -29,7 +40,7 @@
             pageY = event.pageY;
             startX = event.offsetX;
             startY = event.offsetY;
-            this._enshureFly = false;
+            this[_ensureFly] = false;
             mapContainer.css('cursor', 'zoom-in');
 
             selector.css({
@@ -78,7 +89,7 @@
             selectedStart = false;
             selector.remove();
             mapContainer.css('cursor', '');
-            this._enshureFly = true;
+            this[_ensureFly] = true;
           });
 
           mapContainer.on('mouseleave', event => {
@@ -88,20 +99,20 @@
           });
         }
 
-        _removeMapMouseHandlers(){
-          let mapContainer = angular.element(this._map.canvas.parentNode);
+        [_removeMapMouseHandlers](){
+          let mapContainer = angular.element(this[_map].canvas.parentNode);
           mapContainer.unbind('mousedown');
           mapContainer.unbind('mousemove');
           mapContainer.unbind('mouseup');
           mapContainer.unbind('mouseleave');
         }
 
-        _initCesiumMouseHandlers(){
+        [_initCesiumMouseHandlers](){
           let startPosition = null;
           let endPosition = null;
-          let camera = this._map.scene.camera;
-          let ellipsoid = this._map.scene.globe.ellipsoid;
-          let handler = new Cesium.ScreenSpaceEventHandler(this._map.canvas);
+          let camera = this[_map].scene.camera;
+          let ellipsoid = this[_map].scene.globe.ellipsoid;
+          let handler = new Cesium.ScreenSpaceEventHandler(this[_map].canvas);
 
           handler.setInputAction(movement => {
             let cartesian = camera.pickEllipsoid(movement.position);
@@ -130,8 +141,8 @@
               endPosition = null;
             }
 
-            if(this._enshureFly && startPosition !== null && endPosition != null){
-              this._enshureFly = false;
+            if(this[_ensureFly] && startPosition !== null && endPosition != null){
+              this[_ensureFly] = false;
 
               let rectangle = Cesium.Rectangle.fromDegrees(
                 startPosition.lon, startPosition.lat, endPosition.lon, endPosition.lat
@@ -144,23 +155,23 @@
           }, Cesium.ScreenSpaceEventType.LEFT_UP);
         }
 
-        _removeCesiumMouseHandlers(){
-          let handler = new Cesium.ScreenSpaceEventHandler(this._map.canvas);
+        [_removeCesiumMouseHandlers](){
+          let handler = new Cesium.ScreenSpaceEventHandler(this[_map].canvas);
           handler.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_DOWN);
           handler.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_UP);
         }
 
         start(){
-          this._map.scene.screenSpaceCameraController.enableRotate = false;
-          this._enshureFly = false;
-          this._initCesiumMouseHandlers();
-          this._initMapMouseHandlers();
+          this[_map].scene.screenSpaceCameraController.enableRotate = false;
+          this[_ensureFly] = false;
+          this[_initCesiumMouseHandlers]();
+          this[_initMapMouseHandlers]();
         }
 
         stop(){
-          this._map.scene.screenSpaceCameraController.enableRotate = true;
-          this._removeCesiumMouseHandlers();
-          this._removeMapMouseHandlers();
+          this[_map].scene.screenSpaceCameraController.enableRotate = true;
+          this[_removeCesiumMouseHandlers]();
+          this[_removeMapMouseHandlers]();
         }
       }
 
