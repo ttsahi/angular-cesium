@@ -15,7 +15,7 @@
         }
 
         if(handler === undefined){
-          return
+          return;
         }
 
         if(handler === null || typeof handler !== 'object'){
