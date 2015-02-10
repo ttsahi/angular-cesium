@@ -3,9 +3,9 @@
   'use strict';
   angular.module('angularCesium').directive('tool', ['Tool', 'Proxy', function(Tool, Proxy) {
     return {
-      replace: true,
       require: '^toolbar',
-      transclude: 'element',
+      transclude: true,
+      template: '<div style="margin-bottom: 15px;"></div>',
       scope: {type: '='},
       controller: ['$scope', function($scope) {
         this.getTool = (function() {
@@ -32,7 +32,7 @@
           })});
         scope.tool = tool;
         linker(scope, (function(clone) {
-          element.parent().append(clone);
+          return element.children().append(clone);
         }));
       }
     };

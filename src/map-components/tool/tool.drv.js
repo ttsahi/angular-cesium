@@ -9,9 +9,9 @@
   angular.module('angularCesium').directive('tool', ['Tool', 'Proxy',
     function(Tool, Proxy){
       return {
-        replace: true,
         require: '^toolbar',
-        transclude: 'element',
+        transclude: true,
+        template: '<div style="margin-bottom: 15px;"></div>',
         scope: {
           type: '='
         },
@@ -40,9 +40,7 @@
 
           scope.tool = tool;
 
-          linker(scope, (clone) => {
-            element.parent().append(clone);
-          });
+          linker(scope, clone => element.children().append(clone));
         }
       };
     }
