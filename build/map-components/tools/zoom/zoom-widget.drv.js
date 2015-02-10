@@ -4,22 +4,30 @@
   angular.module('angularCesium').directive('zoomWidget', ['$document', function($document) {
     return {
       replace: true,
-      require: '^tool',
+      require: '^^tool',
       template: '<div class="zoom-widget">' + '<div class="zoom-in-btn">' + '<button type="button" class="btn btn-default" ng-click="zoomIn();">' + '<span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span>' + '</button>' + '</div>' + '<div class="slider">' + '<span class="bar">' + '</span>' + '<span class="pointer">' + '</span>' + '</div>' + '<div class="zoom-out-btn">' + '<button type="button" class="btn btn-default" ng-click="zoomOut();">' + '<span class="glyphicon glyphicon-zoom-out" aria-hidden="true"></span>' + '</button>' + '</div>' + '</div>',
       link: function(scope, element, attrs, toolCtrl) {
-        if (isFinite(attrs.width) || isFinite(attrs.height)) {
-          var width = isFinite(attrs.width) ? Number.parseInt(attrs.width) + 'px' : 'inherit';
-          var height = isFinite(attrs.height) ? Number.parseInt(attrs.height) + 'px' : 'inherit';
+        if (!Number.parseInt(attrs.width) || !Number.parseInt(attrs.height)) {
+          var width = Number.parseInt(attrs.width) ? (Number.parseInt(attrs.width) + "px") : 'inherit';
+          var height = Number.parseInt(attrs.height) ? (Number.parseInt(attrs.height) + "px") : 'inherit';
           element.css({
             position: 'relative',
             width: width,
             height: height
           });
         }
-        var minLevel = isFinite(attrs.min) ? Number.parseInt(attrs.min) : 0;
-        var maxLevel = isFinite(attrs.max) ? Number.parseInt(attrs.max) : 100;
+        var minLevel = !Object.is((Number.parseInt(attrs.min)), NaN) ? Number.parseInt(attrs.min) : 0;
+        var maxLevel = !Object.is((Number.parseInt(attrs.max)), NaN) ? Number.parseInt(attrs.max) : 100;
         if (minLevel < 0 || maxLevel < 0 || minLevel >= maxLevel) {
           throw new Error("min or max attributes value are invalid.");
+        }
+        var startLevel = 0;
+        if (!Object.is((startLevel = Number.parseInt(attrs.start)), NaN)) {
+          if (startLevel < minLevel || startLevel > maxLevel) {
+            throw new Error("Invalid start attribute value.");
+          }
+        } else {
+          startLevel = Math.trunc((maxLevel + minLevel) / 2);
         }
         var jumps = isFinite(attrs.jump) ? Number.parseInt(attrs.jump) : 10;
         var zoomTool = toolCtrl.getTool();
@@ -27,12 +35,12 @@
           throw new TypeError("Zoom widget must be inside tool with ZoomTool type.");
         }
         var levelValue = 90 / (maxLevel - minLevel);
-        var currentLevel = (maxLevel - minLevel) / 2;
-        var zoomLevel = (maxLevel + minLevel) / 2;
+        var currentLevel = (maxLevel - minLevel) - (startLevel - minLevel);
+        var zoomLevel = startLevel;
         var tempLevel = zoomLevel;
-        var currentPointerHeight = 45;
+        var currentPointerHeight = currentLevel * levelValue;
         var pointer = angular.element(element.find('span')[2]);
-        pointer.css('top', currentLevel * levelValue + '%');
+        pointer.css('top', (currentPointerHeight + "%"));
         var clientY = null;
         var barHeight = pointer[0].clientHeight * 10;
         var startPointerHeight = currentPointerHeight;

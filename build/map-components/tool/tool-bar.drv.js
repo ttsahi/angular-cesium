@@ -3,12 +3,9 @@
   'use strict';
   angular.module('angularCesium').directive('toolBar', [function() {
     return {
-      require: '^map',
-      controller: ['$scope', function($scope) {
+      require: '^^map',
+      controller: function() {
         var currentTool = null;
-        this.getCesiumWidget = (function() {
-          return $scope.getCesiumWidget();
-        });
         this.startTool = function(tool) {
           if (currentTool !== null) {
             currentTool.stop();
@@ -16,10 +13,7 @@
           currentTool = tool;
           currentTool.start();
         };
-      }],
-      link: {pre: function(scope, element, attrs, mapCtrl) {
-          scope.getCesiumWidget = mapCtrl.getCesiumWidget;
-        }}
+      }
     };
   }]);
 }(window.angular));

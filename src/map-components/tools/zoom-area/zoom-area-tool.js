@@ -10,6 +10,7 @@
     function(Tool, Cesium){
 
       let _map = Symbol('_map');
+      let _active = Symbol('_active');
       let _ensureFly = Symbol('_ensureFly');
       let _mapContainer = Symbol('_mapContainer');
       let _mapEventsHandler = Symbol('_mapEventsHandler');
@@ -29,6 +30,7 @@
       class ZoomAreaTool extends Tool {
         constructor(map){
           this[_map] = map;
+          this[_active] = false;
           this[_ensureFly] = false;
 
           this[_mapContainer] = angular.element(map.canvas.parentNode);
@@ -59,6 +61,10 @@
           selector.css('border', '2px dashed white');
 
           this[_mapContainerMouseDownHandler] = event => {
+            if(!this[_active]){
+              return;
+            }
+
             pageX = event.pageX;
             pageY = event.pageY;
             startX = event.offsetX;
@@ -79,7 +85,7 @@
           };
 
           this[_mapContainerMouseMoveHandler] = event => {
-            if(!selectedStart){
+            if(!this[_active] || !selectedStart){
               return;
             }
 
@@ -109,6 +115,10 @@
           };
 
           this[_mapContainerMouseUpHandler] = event => {
+            if(!this[_active]){
+              return;
+            }
+
             selectedStart = false;
             selector.remove();
             this[_mapContainer].css('cursor', '');
@@ -116,6 +126,10 @@
           };
 
           this[_mapContainerMouseLeave] = event => {
+            if(!this[_active]){
+              return;
+            }
+
             selectedStart = false;
             this[_mapContainer].css('cursor', '');
             selector.remove();
@@ -143,6 +157,10 @@
           let ellipsoid = this[_map].scene.globe.ellipsoid;
 
           this[_cesiumWidgetMouseDownHandler] = movement => {
+            if(!this[_active]){
+              return;
+            }
+
             let cartesian = camera.pickEllipsoid(movement.position);
 
             if(cartesian){
@@ -157,6 +175,10 @@
           };
 
           this[_cesiumWidgetMouseUpHandler] = movement =>  {
+            if(!this[_active]){
+              return;
+            }
+
             let cartesian = camera.pickEllipsoid(movement.position);
 
             if(cartesian){
@@ -191,19 +213,29 @@
         [_unbindCesiumWidgetMouseHandlers](){
           this[_mapEventsHandler].removeInputAction(Cesium.ScreenSpaceEventType.LEFT_DOWN);
           this[_mapEventsHandler].removeInputAction(Cesium.ScreenSpaceEventType.LEFT_UP);
-      }
+        }
 
         start(){
           this[_map].scene.screenSpaceCameraController.enableRotate = false;
           this[_ensureFly] = false;
           this[_bindCesiumWidgetMouseHandlers]();
           this[_bindMapContainerMouseHandlers]();
+          this[_active] = true;
         }
 
         stop(){
+          this[_active] = false;
           this[_map].scene.screenSpaceCameraController.enableRotate = true;
           this[_unbindMapContainerMouseHandlers]();
           this[_unbindCesiumWidgetMouseHandlers]();
+        }
+
+        toggle(){
+          if(this[_active]){
+            this.stop();
+          }else{
+            this.start();
+          }
         }
       }
 
