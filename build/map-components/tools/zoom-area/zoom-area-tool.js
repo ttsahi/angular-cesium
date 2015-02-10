@@ -4,6 +4,7 @@
   angular.module('angularCesium').factory('ZoomAreaTool', ['Tool', 'Cesium', function(Tool, Cesium) {
     var $__2;
     var _map = Symbol('_map');
+    var _active = Symbol('_active');
     var _ensureFly = Symbol('_ensureFly');
     var _mapContainer = Symbol('_mapContainer');
     var _mapEventsHandler = Symbol('_mapEventsHandler');
@@ -21,6 +22,7 @@
     var _unbindCesiumWidgetMouseHandlers = Symbol('_unbindCesiumWidgetMouseHandlers');
     var ZoomAreaTool = function ZoomAreaTool(map) {
       this[_map] = map;
+      this[_active] = false;
       this[_ensureFly] = false;
       this[_mapContainer] = angular.element(map.canvas.parentNode);
       this[_mapEventsHandler] = new Cesium.ScreenSpaceEventHandler(map.canvas);
@@ -46,6 +48,9 @@
         var selector = angular.element('<div></div>');
         selector.css('border', '2px dashed white');
         this[_mapContainerMouseDownHandler] = (function(event) {
+          if (!$__0[_active]) {
+            return;
+          }
           pageX = event.pageX;
           pageY = event.pageY;
           startX = event.offsetX;
@@ -63,7 +68,7 @@
           selectedStart = true;
         });
         this[_mapContainerMouseMoveHandler] = (function(event) {
-          if (!selectedStart) {
+          if (!$__0[_active] || !selectedStart) {
             return;
           }
           deltaX = event.pageX - pageX;
@@ -88,12 +93,18 @@
           selector.css(selectorStyle);
         });
         this[_mapContainerMouseUpHandler] = (function(event) {
+          if (!$__0[_active]) {
+            return;
+          }
           selectedStart = false;
           selector.remove();
           $__0[_mapContainer].css('cursor', '');
           $__0[_ensureFly] = true;
         });
         this[_mapContainerMouseLeave] = (function(event) {
+          if (!$__0[_active]) {
+            return;
+          }
           selectedStart = false;
           $__0[_mapContainer].css('cursor', '');
           selector.remove();
@@ -130,6 +141,9 @@
         var camera = this[_map].scene.camera;
         var ellipsoid = this[_map].scene.globe.ellipsoid;
         this[_cesiumWidgetMouseDownHandler] = (function(movement) {
+          if (!$__0[_active]) {
+            return;
+          }
           var cartesian = camera.pickEllipsoid(movement.position);
           if (cartesian) {
             var cartographic = ellipsoid.cartesianToCartographic(cartesian);
@@ -142,6 +156,9 @@
           }
         });
         this[_cesiumWidgetMouseUpHandler] = (function(movement) {
+          if (!$__0[_active]) {
+            return;
+          }
           var cartesian = camera.pickEllipsoid(movement.position);
           if (cartesian) {
             var cartographic = ellipsoid.cartesianToCartographic(cartesian);
@@ -184,15 +201,28 @@
         this[_ensureFly] = false;
         this[_bindCesiumWidgetMouseHandlers]();
         this[_bindMapContainerMouseHandlers]();
+        this[_active] = true;
       },
       configurable: true,
       enumerable: true,
       writable: true
     }), Object.defineProperty($__2, "stop", {
       value: function() {
+        this[_active] = false;
         this[_map].scene.screenSpaceCameraController.enableRotate = true;
         this[_unbindMapContainerMouseHandlers]();
         this[_unbindCesiumWidgetMouseHandlers]();
+      },
+      configurable: true,
+      enumerable: true,
+      writable: true
+    }), Object.defineProperty($__2, "toggle", {
+      value: function() {
+        if (this[_active]) {
+          this.stop();
+        } else {
+          this.start();
+        }
       },
       configurable: true,
       enumerable: true,

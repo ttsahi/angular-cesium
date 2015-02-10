@@ -10,7 +10,7 @@
     function($document){
       return {
         replace: true,
-        require: '^tool',
+        require: '^^tool',
         template: '<div class="zoom-widget">' +
         '<div class="zoom-in-btn">' +
         '<button type="button" class="btn btn-default" ng-click="zoomIn();">' +
@@ -30,17 +30,27 @@
         '</div>' +
         '</div>',
         link: function(scope, element, attrs, toolCtrl){
-          if(isFinite(attrs.width) || isFinite(attrs.height)){
-            let width =  isFinite(attrs.width) ? Number.parseInt(attrs.width) + 'px' : 'inherit';
-            let height =  isFinite(attrs.height) ? Number.parseInt(attrs.height) + 'px' : 'inherit';
+          if(!Number.parseInt(attrs.width) || !Number.parseInt(attrs.height)){
+            let width =  Number.parseInt(attrs.width) ? `${Number.parseInt(attrs.width)}px` : 'inherit';
+            let height =  Number.parseInt(attrs.height) ? `${Number.parseInt(attrs.height)}px` : 'inherit';
             element.css({position: 'relative', width: width, height: height});
           }
 
-          let minLevel = isFinite(attrs.min) ? Number.parseInt(attrs.min) : 0;
-          let maxLevel = isFinite(attrs.max) ? Number.parseInt(attrs.max) : 100;
+          let minLevel = !Object.is((Number.parseInt(attrs.min)),NaN) ? Number.parseInt(attrs.min) : 0;
+          let maxLevel = !Object.is((Number.parseInt(attrs.max)),NaN)  ? Number.parseInt(attrs.max) : 100;
 
           if(minLevel < 0 || maxLevel < 0 || minLevel >= maxLevel){
             throw new Error("min or max attributes value are invalid.");
+          }
+
+          let startLevel = 0;
+
+          if(!Object.is((startLevel = Number.parseInt(attrs.start)),NaN)){
+            if(startLevel < minLevel || startLevel > maxLevel){
+              throw new Error("Invalid start attribute value.");
+            }
+          }else{
+            startLevel = Math.trunc((maxLevel + minLevel) / 2);
           }
 
           let jumps = isFinite(attrs.jump) ? Number.parseInt(attrs.jump) : 10;
@@ -52,13 +62,13 @@
           }
 
           let levelValue = 90 / (maxLevel - minLevel);
-          let currentLevel = (maxLevel - minLevel) / 2;
-          let zoomLevel = (maxLevel + minLevel) / 2;
+          let currentLevel = (maxLevel - minLevel) - (startLevel - minLevel);
+          let zoomLevel = startLevel;
           let tempLevel = zoomLevel;
-          let currentPointerHeight = 45;
+          let currentPointerHeight = currentLevel * levelValue;
 
           let pointer  = angular.element(element.find('span')[2]);
-          pointer.css('top', currentLevel * levelValue + '%');
+          pointer.css('top', `${currentPointerHeight}%`);
 
           let clientY = null;
           let barHeight = pointer[0].clientHeight * 10;
