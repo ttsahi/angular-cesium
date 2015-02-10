@@ -117,7 +117,7 @@
                 zoomTool.zoomOut((tempLevel - zoomLevel) * jumps);
               }
               tempLevel = zoomLevel;
-              pointer.css('top', currentLevel * levelValue + '%');
+              pointer.css('top', `${currentLevel * levelValue}%`);
             }
           });
 
@@ -126,7 +126,7 @@
               zoomLevel++;
               currentLevel--;
               currentPointerHeight = currentLevel * levelValue;
-              pointer.css('top', currentPointerHeight + '%');
+              pointer.css('top', `${currentPointerHeight}%`);
               zoomTool.zoomIn(jumps);
             }
           };
@@ -136,7 +136,7 @@
               zoomLevel--;
               currentLevel++;
               currentPointerHeight = currentLevel * levelValue;
-              pointer.css('top', currentPointerHeight + '%');
+              pointer.css('top', `${currentPointerHeight}%`);
               zoomTool.zoomOut(jumps);
             }
           };
