@@ -5,15 +5,35 @@
     var $__2;
     var _map = Symbol('_map');
     var _ensureFly = Symbol('_ensureFly');
-    var _initMapMouseHandlers = Symbol('_initMapMouseHandlers');
-    var _removeMapMouseHandlers = Symbol('_removeMapMouseHandlers');
-    var _initCesiumMouseHandlers = Symbol('_initCesiumMouseHandlers');
-    var _removeCesiumMouseHandlers = Symbol('_removeCesiumMouseHandlers');
+    var _mapContainer = Symbol('_mapContainer');
+    var _mapEventsHandler = Symbol('_mapEventsHandler');
+    var _mapContainerMouseDownHandler = Symbol('_mapContainerMouseDownHandler');
+    var _mapContainerMouseMoveHandler = Symbol('_mapContainerMouseMoveHandler');
+    var _mapContainerMouseUpHandler = Symbol('_mapContainerMouseUpHandler');
+    var _mapContainerMouseLeave = Symbol('_mapContainerMouseLeave');
+    var _cesiumWidgetMouseDownHandler = Symbol('_cesiumWidgetMouseDownHandler');
+    var _cesiumWidgetMouseUpHandler = Symbol('_cesiumWidgetMouseUpHandler');
+    var _initMapContainerMouseHandlers = Symbol('_initMapContainerMouseHandlers');
+    var _bindMapContainerMouseHandlers = Symbol('_bindMapContainerMouseHandlers');
+    var _unbindMapContainerMouseHandlers = Symbol('_unbindMapContainerMouseHandlers');
+    var _initCesiumWidgetMouseHandlers = Symbol('_initCesiumWidgetMouseHandlers');
+    var _bindCesiumWidgetMouseHandlers = Symbol('_bindCesiumWidgetMouseHandlers');
+    var _unbindCesiumWidgetMouseHandlers = Symbol('_unbindCesiumWidgetMouseHandlers');
     var ZoomAreaTool = function ZoomAreaTool(map) {
       this[_map] = map;
       this[_ensureFly] = false;
+      this[_mapContainer] = angular.element(map.canvas.parentNode);
+      this[_mapEventsHandler] = new Cesium.ScreenSpaceEventHandler(map.canvas);
+      this[_mapContainerMouseDownHandler] = null;
+      this[_mapContainerMouseMoveHandler] = null;
+      this[_mapContainerMouseUpHandler] = null;
+      this[_mapContainerMouseLeave] = null;
+      this[_cesiumWidgetMouseDownHandler] = null;
+      this[_cesiumWidgetMouseUpHandler] = null;
+      this[_initMapContainerMouseHandlers]();
+      this[_initCesiumWidgetMouseHandlers]();
     };
-    ($traceurRuntime.createClass)(ZoomAreaTool, ($__2 = {}, Object.defineProperty($__2, _initMapMouseHandlers, {
+    ($traceurRuntime.createClass)(ZoomAreaTool, ($__2 = {}, Object.defineProperty($__2, _initMapContainerMouseHandlers, {
       value: function() {
         var $__0 = this;
         var pageX = 0;
@@ -24,15 +44,14 @@
         var deltaY = 0;
         var selectedStart = false;
         var selector = angular.element('<div></div>');
-        var mapContainer = angular.element(this[_map].canvas.parentNode);
         selector.css('border', '2px dashed white');
-        mapContainer.on('mousedown', (function(event) {
+        this[_mapContainerMouseDownHandler] = (function(event) {
           pageX = event.pageX;
           pageY = event.pageY;
           startX = event.offsetX;
           startY = event.offsetY;
           $__0[_ensureFly] = false;
-          mapContainer.css('cursor', 'zoom-in');
+          $__0[_mapContainer].css('cursor', 'zoom-in');
           selector.css({
             position: 'absolute',
             top: (startY + "px"),
@@ -40,10 +59,10 @@
             width: '0px',
             height: '0px'
           });
-          mapContainer.append(selector);
+          $__0[_mapContainer].append(selector);
           selectedStart = true;
-        }));
-        mapContainer.on('mousemove', (function(event) {
+        });
+        this[_mapContainerMouseMoveHandler] = (function(event) {
           if (!selectedStart) {
             return;
           }
@@ -67,42 +86,50 @@
             selectorStyle.top = ((startY - deltaY) + "px");
           }
           selector.css(selectorStyle);
-        }));
-        mapContainer.on('mouseup', (function(event) {
+        });
+        this[_mapContainerMouseUpHandler] = (function(event) {
           selectedStart = false;
           selector.remove();
-          mapContainer.css('cursor', '');
+          $__0[_mapContainer].css('cursor', '');
           $__0[_ensureFly] = true;
-        }));
-        mapContainer.on('mouseleave', (function(event) {
+        });
+        this[_mapContainerMouseLeave] = (function(event) {
           selectedStart = false;
-          mapContainer.css('cursor', '');
+          $__0[_mapContainer].css('cursor', '');
           selector.remove();
-        }));
+        });
       },
       configurable: true,
       enumerable: true,
       writable: true
-    }), Object.defineProperty($__2, _removeMapMouseHandlers, {
+    }), Object.defineProperty($__2, _bindMapContainerMouseHandlers, {
       value: function() {
-        var mapContainer = angular.element(this[_map].canvas.parentNode);
-        mapContainer.unbind('mousedown');
-        mapContainer.unbind('mousemove');
-        mapContainer.unbind('mouseup');
-        mapContainer.unbind('mouseleave');
+        this[_mapContainer].on('mousedown', this[_mapContainerMouseDownHandler]);
+        this[_mapContainer].on('mousemove', this[_mapContainerMouseMoveHandler]);
+        this[_mapContainer].on('mouseup', this[_mapContainerMouseUpHandler]);
+        this[_mapContainer].on('mouseleave', this[_mapContainerMouseLeave]);
       },
       configurable: true,
       enumerable: true,
       writable: true
-    }), Object.defineProperty($__2, _initCesiumMouseHandlers, {
+    }), Object.defineProperty($__2, _unbindMapContainerMouseHandlers, {
+      value: function() {
+        this[_mapContainer].off('mousedown', this[_mapContainerMouseDownHandler]);
+        this[_mapContainer].off('mousemove', this[_mapContainerMouseMoveHandler]);
+        this[_mapContainer].off('mouseup', this[_mapContainerMouseUpHandler]);
+        this[_mapContainer].off('mouseleave', this[_mapContainerMouseLeave]);
+      },
+      configurable: true,
+      enumerable: true,
+      writable: true
+    }), Object.defineProperty($__2, _initCesiumWidgetMouseHandlers, {
       value: function() {
         var $__0 = this;
         var startPosition = null;
         var endPosition = null;
         var camera = this[_map].scene.camera;
         var ellipsoid = this[_map].scene.globe.ellipsoid;
-        var handler = new Cesium.ScreenSpaceEventHandler(this[_map].canvas);
-        handler.setInputAction((function(movement) {
+        this[_cesiumWidgetMouseDownHandler] = (function(movement) {
           var cartesian = camera.pickEllipsoid(movement.position);
           if (cartesian) {
             var cartographic = ellipsoid.cartesianToCartographic(cartesian);
@@ -113,8 +140,8 @@
           } else {
             startPosition = null;
           }
-        }), Cesium.ScreenSpaceEventType.LEFT_DOWN);
-        handler.setInputAction((function(movement) {
+        });
+        this[_cesiumWidgetMouseUpHandler] = (function(movement) {
           var cartesian = camera.pickEllipsoid(movement.position);
           if (cartesian) {
             var cartographic = ellipsoid.cartesianToCartographic(cartesian);
@@ -130,16 +157,23 @@
             var rectangle = Cesium.Rectangle.fromDegrees(startPosition.lon, startPosition.lat, endPosition.lon, endPosition.lat);
             camera.flyToRectangle({destination: rectangle});
           }
-        }), Cesium.ScreenSpaceEventType.LEFT_UP);
+        });
       },
       configurable: true,
       enumerable: true,
       writable: true
-    }), Object.defineProperty($__2, _removeCesiumMouseHandlers, {
+    }), Object.defineProperty($__2, _bindCesiumWidgetMouseHandlers, {
       value: function() {
-        var handler = new Cesium.ScreenSpaceEventHandler(this[_map].canvas);
-        handler.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_DOWN);
-        handler.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_UP);
+        this[_mapEventsHandler].setInputAction(this[_cesiumWidgetMouseDownHandler], Cesium.ScreenSpaceEventType.LEFT_DOWN);
+        this[_mapEventsHandler].setInputAction(this[_cesiumWidgetMouseUpHandler], Cesium.ScreenSpaceEventType.LEFT_UP);
+      },
+      configurable: true,
+      enumerable: true,
+      writable: true
+    }), Object.defineProperty($__2, _unbindCesiumWidgetMouseHandlers, {
+      value: function() {
+        this[_mapEventsHandler].removeInputAction(Cesium.ScreenSpaceEventType.LEFT_DOWN);
+        this[_mapEventsHandler].removeInputAction(Cesium.ScreenSpaceEventType.LEFT_UP);
       },
       configurable: true,
       enumerable: true,
@@ -148,8 +182,8 @@
       value: function() {
         this[_map].scene.screenSpaceCameraController.enableRotate = false;
         this[_ensureFly] = false;
-        this[_initCesiumMouseHandlers]();
-        this[_initMapMouseHandlers]();
+        this[_bindCesiumWidgetMouseHandlers]();
+        this[_bindMapContainerMouseHandlers]();
       },
       configurable: true,
       enumerable: true,
@@ -157,8 +191,8 @@
     }), Object.defineProperty($__2, "stop", {
       value: function() {
         this[_map].scene.screenSpaceCameraController.enableRotate = true;
-        this[_removeCesiumMouseHandlers]();
-        this[_removeMapMouseHandlers]();
+        this[_unbindMapContainerMouseHandlers]();
+        this[_unbindCesiumWidgetMouseHandlers]();
       },
       configurable: true,
       enumerable: true,
