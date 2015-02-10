@@ -11,7 +11,6 @@
       return {
         require: '^toolbar',
         transclude: true,
-        template: '<div style="margin-bottom: 15px;"></div>',
         scope: {
           type: '='
         },
@@ -40,7 +39,7 @@
 
           scope.tool = tool;
 
-          linker(scope, clone => element.children().append(clone));
+          linker(scope, clone => element.append(clone));
         }
       };
     }
