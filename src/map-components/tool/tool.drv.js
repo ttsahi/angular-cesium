@@ -22,7 +22,7 @@
           }
         ],
         link: function(scope, element, attrs, toolBarCtrl, linker){
-          if(!(typeof scope.type === 'function')){
+          if(typeof scope.type !== 'function'){
             throw new TypeError("type attr must be constructor.");
           }
 
