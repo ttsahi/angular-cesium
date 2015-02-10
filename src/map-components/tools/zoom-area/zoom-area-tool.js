@@ -11,18 +11,42 @@
 
       let _map = Symbol('_map');
       let _ensureFly = Symbol('_ensureFly');
-      let _initMapMouseHandlers = Symbol('_initMapMouseHandlers');
-      let _removeMapMouseHandlers = Symbol('_removeMapMouseHandlers');
-      let _initCesiumMouseHandlers = Symbol('_initCesiumMouseHandlers');
-      let _removeCesiumMouseHandlers = Symbol('_removeCesiumMouseHandlers');
+      let _mapContainer = Symbol('_mapContainer');
+      let _mapEventsHandler = Symbol('_mapEventsHandler');
+      let _mapContainerMouseDownHandler = Symbol('_mapContainerMouseDownHandler');
+      let _mapContainerMouseMoveHandler = Symbol('_mapContainerMouseMoveHandler');
+      let _mapContainerMouseUpHandler = Symbol('_mapContainerMouseUpHandler');
+      let _mapContainerMouseLeave = Symbol('_mapContainerMouseLeave');
+      let _cesiumWidgetMouseDownHandler = Symbol('_cesiumWidgetMouseDownHandler');
+      let _cesiumWidgetMouseUpHandler = Symbol('_cesiumWidgetMouseUpHandler');
+      let _initMapContainerMouseHandlers = Symbol('_initMapContainerMouseHandlers');
+      let _bindMapContainerMouseHandlers = Symbol('_bindMapContainerMouseHandlers');
+      let _unbindMapContainerMouseHandlers = Symbol('_unbindMapContainerMouseHandlers');
+      let _initCesiumWidgetMouseHandlers = Symbol('_initCesiumWidgetMouseHandlers');
+      let _bindCesiumWidgetMouseHandlers = Symbol('_bindCesiumWidgetMouseHandlers');
+      let _unbindCesiumWidgetMouseHandlers = Symbol('_unbindCesiumWidgetMouseHandlers');
 
       class ZoomAreaTool extends Tool {
         constructor(map){
           this[_map] = map;
           this[_ensureFly] = false;
+
+          this[_mapContainer] = angular.element(map.canvas.parentNode);
+          this[_mapEventsHandler] = new Cesium.ScreenSpaceEventHandler(map.canvas);
+
+          this[_mapContainerMouseDownHandler] = null;
+          this[_mapContainerMouseMoveHandler] = null;
+          this[_mapContainerMouseUpHandler] = null;
+          this[_mapContainerMouseLeave] = null;
+
+          this[_cesiumWidgetMouseDownHandler] = null;
+          this[_cesiumWidgetMouseUpHandler] = null;
+
+          this[_initMapContainerMouseHandlers]();
+          this[_initCesiumWidgetMouseHandlers]();
         }
 
-        [_initMapMouseHandlers](){
+        [_initMapContainerMouseHandlers](){
           let pageX = 0;
           let pageY = 0;
           let startX = 0;
@@ -30,18 +54,17 @@
           let deltaX = 0;
           let deltaY = 0;
           let selectedStart = false;
-          let selector = angular.element('<div></div>');
-          let mapContainer = angular.element(this[_map].canvas.parentNode);
 
+          let selector = angular.element('<div></div>');
           selector.css('border', '2px dashed white');
 
-          mapContainer.on('mousedown', event => {
+          this[_mapContainerMouseDownHandler] = event => {
             pageX = event.pageX;
             pageY = event.pageY;
             startX = event.offsetX;
             startY = event.offsetY;
             this[_ensureFly] = false;
-            mapContainer.css('cursor', 'zoom-in');
+            this[_mapContainer].css('cursor', 'zoom-in');
 
             selector.css({
               position: 'absolute',
@@ -51,11 +74,11 @@
               height: '0px'
             });
 
-            mapContainer.append(selector);
+            this[_mapContainer].append(selector);
             selectedStart = true;
-          });
+          };
 
-          mapContainer.on('mousemove', event => {
+          this[_mapContainerMouseMoveHandler] = event => {
             if(!selectedStart){
               return;
             }
@@ -83,38 +106,43 @@
             }
 
             selector.css(selectorStyle);
-          });
+          };
 
-          mapContainer.on('mouseup', event => {
+          this[_mapContainerMouseUpHandler] = event => {
             selectedStart = false;
             selector.remove();
-            mapContainer.css('cursor', '');
+            this[_mapContainer].css('cursor', '');
             this[_ensureFly] = true;
-          });
+          };
 
-          mapContainer.on('mouseleave', event => {
+          this[_mapContainerMouseLeave] = event => {
             selectedStart = false;
-            mapContainer.css('cursor', '');
+            this[_mapContainer].css('cursor', '');
             selector.remove();
-          });
+          };
         }
 
-        [_removeMapMouseHandlers](){
-          let mapContainer = angular.element(this[_map].canvas.parentNode);
-          mapContainer.unbind('mousedown');
-          mapContainer.unbind('mousemove');
-          mapContainer.unbind('mouseup');
-          mapContainer.unbind('mouseleave');
+        [_bindMapContainerMouseHandlers](){
+          this[_mapContainer].on('mousedown', this[_mapContainerMouseDownHandler]);
+          this[_mapContainer].on('mousemove', this[_mapContainerMouseMoveHandler]);
+          this[_mapContainer].on('mouseup', this[_mapContainerMouseUpHandler]);
+          this[_mapContainer].on('mouseleave', this[_mapContainerMouseLeave]);
         }
 
-        [_initCesiumMouseHandlers](){
+        [_unbindMapContainerMouseHandlers](){
+          this[_mapContainer].off('mousedown', this[_mapContainerMouseDownHandler]);
+          this[_mapContainer].off('mousemove', this[_mapContainerMouseMoveHandler]);
+          this[_mapContainer].off('mouseup', this[_mapContainerMouseUpHandler]);
+          this[_mapContainer].off('mouseleave', this[_mapContainerMouseLeave]);
+        }
+
+        [_initCesiumWidgetMouseHandlers](){
           let startPosition = null;
           let endPosition = null;
           let camera = this[_map].scene.camera;
           let ellipsoid = this[_map].scene.globe.ellipsoid;
-          let handler = new Cesium.ScreenSpaceEventHandler(this[_map].canvas);
 
-          handler.setInputAction(movement => {
+          this[_cesiumWidgetMouseDownHandler] = movement => {
             let cartesian = camera.pickEllipsoid(movement.position);
 
             if(cartesian){
@@ -126,9 +154,9 @@
             }else{
               startPosition = null;
             }
-          }, Cesium.ScreenSpaceEventType.LEFT_DOWN);
+          };
 
-          handler.setInputAction(movement =>  {
+          this[_cesiumWidgetMouseUpHandler] = movement =>  {
             let cartesian = camera.pickEllipsoid(movement.position);
 
             if(cartesian){
@@ -152,26 +180,30 @@
                 destination: rectangle
               });
             }
-          }, Cesium.ScreenSpaceEventType.LEFT_UP);
+          };
         }
 
-        [_removeCesiumMouseHandlers](){
-          let handler = new Cesium.ScreenSpaceEventHandler(this[_map].canvas);
-          handler.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_DOWN);
-          handler.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_UP);
+        [_bindCesiumWidgetMouseHandlers](){
+          this[_mapEventsHandler].setInputAction(this[_cesiumWidgetMouseDownHandler], Cesium.ScreenSpaceEventType.LEFT_DOWN);
+          this[_mapEventsHandler].setInputAction(this[_cesiumWidgetMouseUpHandler], Cesium.ScreenSpaceEventType.LEFT_UP);
         }
+
+        [_unbindCesiumWidgetMouseHandlers](){
+          this[_mapEventsHandler].removeInputAction(Cesium.ScreenSpaceEventType.LEFT_DOWN);
+          this[_mapEventsHandler].removeInputAction(Cesium.ScreenSpaceEventType.LEFT_UP);
+      }
 
         start(){
           this[_map].scene.screenSpaceCameraController.enableRotate = false;
           this[_ensureFly] = false;
-          this[_initCesiumMouseHandlers]();
-          this[_initMapMouseHandlers]();
+          this[_bindCesiumWidgetMouseHandlers]();
+          this[_bindMapContainerMouseHandlers]();
         }
 
         stop(){
           this[_map].scene.screenSpaceCameraController.enableRotate = true;
-          this[_removeCesiumMouseHandlers]();
-          this[_removeMapMouseHandlers]();
+          this[_unbindMapContainerMouseHandlers]();
+          this[_unbindCesiumWidgetMouseHandlers]();
         }
       }
 
