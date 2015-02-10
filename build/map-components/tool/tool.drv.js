@@ -5,7 +5,11 @@
     return {
       require: '^toolbar',
       transclude: true,
-      scope: {type: '='},
+      template: '<div ng-class="class"></div>',
+      scope: {
+        type: '=',
+        class: '@'
+      },
       controller: ['$scope', function($scope) {
         this.getTool = (function() {
           return $scope.tool;
@@ -31,7 +35,7 @@
           })});
         scope.tool = tool;
         linker(scope, (function(clone) {
-          return element.append(clone);
+          return element.children().append(clone);
         }));
       }
     };
