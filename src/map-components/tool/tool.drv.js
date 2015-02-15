@@ -6,53 +6,43 @@
 
   'use strict';
 
-  angular.module('angularCesium').directive('tool', ['Tool',
-    function(Tool){
+  angular.module('angularCesium').directive('tool', ['Tool', 'Proxy',
+    function(Tool, Proxy){
       return {
-        replace: true,
-        require: '^toolbar',
-        transclude: 'element',
+        require: ['^^map', '^^toolbar'],
+        transclude: true,
+        template: '<div ng-class="class"></div>',
         scope: {
-          type: '='
+          type: '=',
+          class: '@'
         },
         controller: ['$scope',
           function($scope){
             this.getTool = () => $scope.tool;
           }
         ],
-        link :  function(scope, element, attrs, toolBarCtrl, linker){
-                  if(!(typeof scope.type === 'function')){
-                    throw new TypeError("type attr must be constructor.");
-                  }
+        link: function(scope, element, attrs, ctrls, linker){
+          if(typeof scope.type !== 'function'){
+            throw new TypeError("type attr must be constructor.");
+          }
 
-                  let tool = new scope.type(toolBarCtrl.getCesiumWidget());
+          let tool = new scope.type(ctrls[0].getCesiumWidget());
 
-                  if(!(tool instanceof Tool)){
-                    throw new TypeError("tool must be instance of Tool.");
-                  }
+          if(!(tool instanceof Tool)){
+            throw new TypeError("tool must be instance of Tool.");
+          }
 
-                  let proxy = {};
+          tool.start = Proxy(tool.start, {
+            apply: (target, context) => ctrls[1].startTool({
+              start: () => target.apply(tool),
+              stop: () => tool.stop()
+            })
+          });
 
-                  for(let key in tool){
-                    if(key === 'start'){
-                      continue;
-                    }
-                    Object.defineProperty(proxy, key, {
-                      get: () => tool[key],
-                      set: val => { tool[key] = val; }
-                    });
-                  }
+          scope.tool = tool;
 
-                  Object.defineProperty(proxy, 'start', {
-                    get: () => () => toolBarCtrl.startTool(tool)
-                  });
-
-                  scope.tool = proxy;
-
-                  linker(scope, (clone) => {
-                    element.parent().append(clone);
-                  });
-                }
+          linker(scope, clone => element.children().append(clone));
+        }
       };
     }
   ]);

@@ -12,7 +12,6 @@
     function(){
 
       class Tool {
-        constructor(map){ this._map = map; }
         start(){ throw "No implementation"; }
         stop(){ throw "No implementation"; }
         cancel(){ throw "No implementation";}

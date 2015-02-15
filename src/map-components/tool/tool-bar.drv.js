@@ -9,29 +9,18 @@
   angular.module('angularCesium').directive('toolBar', [
     function(){
       return {
-        require: '^map',
-        //transclude: true,
-        //template: '<div ng-transclude=""></div>',
-        controller: ['$scope',
-          function($scope) {
-            let currentTool = null;
+        require: '^^map',
+        controller: function() {
+          let currentTool = null;
 
-            this.getCesiumWidget = () => $scope.getCesiumWidget();
+          this.startTool = function(tool){
+            if(currentTool !== null){
+              currentTool.stop();
+            }
 
-            this.startTool = function(tool){
-              if(currentTool !== null){
-                currentTool.stop();
-              }
-
-              currentTool = tool;
-              currentTool.start();
-            };
-          }
-        ],
-        link: {
-          pre: function(scope, element, attrs, mapCtrl){
-            scope.getCesiumWidget = mapCtrl.getCesiumWidget;
-          }
+            currentTool = tool;
+            currentTool.start();
+          };
         }
       };
     }
