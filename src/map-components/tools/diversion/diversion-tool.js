@@ -15,9 +15,9 @@
           this._canvas = map.canvas;
         }
 
-        start(){ this._scene.screenSpaceCameraController.enableRotate = true;angular.element(this._canvas).css('cursor','-webkit-grab'); console.log(this._canvas,angular.element(this._canvas))}
+        start(){ this._scene.screenSpaceCameraController.enableRotate = true;angular.element(this._canvas).css('cursor','-webkit-grab'); }
 
-        stop(){ this._scene.screenSpaceCameraController.enableRotate = false; angular.element(this._canvas).css('cursor','initial');console.log('diversion end')}
+        stop(){ this._scene.screenSpaceCameraController.enableRotate = false; angular.element(this._canvas).css('cursor','initial');}
 
         cancel(){ console.log('Examp-Tool start!'); }
 
