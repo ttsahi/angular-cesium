@@ -28,7 +28,7 @@
               let point = {
                 lon: Cesium.Math.toDegrees(cartographic.longitude),
                 lat: Cesium.Math.toDegrees(cartographic.latitude)
-              };console.log(point.lon, point.lat,cameraHeight)
+              };
               this._camera.flyTo({
                 destination: Cesium.Cartesian3.fromDegrees(point.lon, point.lat, cameraHeight)
               });
