@@ -11,10 +11,10 @@
       return {
         require: ['^^map', '^^toolbar'],
         transclude: true,
-        template: '<div ng-class="class"></div>',
+        template: '<div ng-class="toolClass"></div>',
         scope: {
           type: '=',
-          class: '@'
+          toolClass: '@'
         },
         controller: ['$scope',
           function($scope){
