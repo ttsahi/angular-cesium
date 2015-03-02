@@ -30,16 +30,17 @@ describe('src', function(){
         expect(elem.html()).toContain('<div class="toolbar"');
       });
       describe('controller',function(){
-        var ctrl,toolbarElem;
+        var ctrl,scope,toolbarElem;
         beforeEach(function(){
           elem = $compile('<map><toolbar></toolbar></map>')($scope);
           $scope.$digest();
           elem.find('toolbar')
           toolbarElem = angular.element(elem.find('toolbar')[0]);
+          scope = toolbarElem.scope();
           ctrl = toolbarElem.controller('toolbar');
         });
         it('getCesiumWidget should NOT be undefined', function(){
-          expect(ctrl.getCesiumWidget()).not.toBeUndefined(true);
+          expect(scope.getCesiumWidget()).not.toBeUndefined(true);
         });
         it('mapRect should NOT be undefined', function(){
           expect(toolbarElem.scope().mapRect().constructor.name).toBe('ClientRect');
@@ -47,7 +48,7 @@ describe('src', function(){
         describe('startTool function', function(){
           var tool;
           beforeEach(inject(function(Tool){
-            tool = new Tool(ctrl.getCesiumWidget());
+            tool = new Tool(scope.getCesiumWidget());
             spyOn(tool,'start');
             spyOn(tool,'stop');
           }));

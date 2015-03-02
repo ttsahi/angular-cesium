@@ -20,7 +20,6 @@
 
         _startHandler(){
           this._handler.setInputAction(movement => {
-
             let cartesian = this._camera.pickEllipsoid(movement.position);
             if(cartesian){
               let cameraHeight = this._ellipsoid.cartesianToCartographic(this._camera.position).height;
